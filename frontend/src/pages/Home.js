@@ -125,18 +125,7 @@ export default function Home() {
     setPageLoading(false);
   }, [userCoords]);
 
-  const fetchShops = async () => {
-    setPageLoading(true);
-    try {
-      const res = await axios.get(`${API_URL}/api/shops`);
-      setShops(Array.isArray(res.data) ? res.data : []);
-    } catch (err) {
-      console.error("Fetch Shops Error:", err);
-      setShops([]);
-    } finally {
-      setPageLoading(false);
-    }
-  };
+
 
   // Fetch nearby shops
   const fetchNearby = () => {

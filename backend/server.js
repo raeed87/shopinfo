@@ -23,6 +23,9 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected"))
   .catch(err => console.log(err));
 
+// Health check for Render
+app.get("/health", (req, res) => res.status(200).send("OK"));
+
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/shops", require("./routes/shopRoutes"));
 app.use("/api/products", require("./routes/productRoutes"));
@@ -39,4 +42,6 @@ if (process.env.NODE_ENV === "production") {
   app.get("/", (req, res) => res.send("API is running..."));
 }
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server running on port ${PORT} (binding to 0.0.0.0)`);
+});

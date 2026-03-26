@@ -12,7 +12,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
 });
 
-const API_URL = process.env.REACT_APP_API_URL || (window.location.hostname === "localhost" ? "http://localhost:5001" : "");
+const API_URL = process.env.REACT_APP_API_URL || (["localhost", "127.0.0.1"].includes(window.location.hostname) ? "http://localhost:5001" : "");
 
 const CATEGORY_ICONS = {
   Food: "🍽️", Electronics: "📱", Clothing: "👗",

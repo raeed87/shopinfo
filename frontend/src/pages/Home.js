@@ -8,7 +8,7 @@ const CATEGORY_ICONS = {
   Grocery: "🛒", Pharmacy: "💊", Other: "📦", Services: "🔧", Books: "📚",
 };
 
-const API_URL = process.env.REACT_APP_API_URL || (window.location.hostname === "localhost" ? "http://localhost:5001" : "");
+const API_URL = process.env.REACT_APP_API_URL || (["localhost", "127.0.0.1"].includes(window.location.hostname) ? "http://localhost:5001" : "");
 
 // Calculate Haversine distance with high precision formatting
 // Calculate Haversine distance with high precision formatting
@@ -145,10 +145,13 @@ export default function Home() {
             const distVal = sc ? getDistanceKmRaw(coords, sc) : Infinity;
             return { ...s, distVal };
           }).sort((a, b) => a.distVal - b.distVal);
+          setShops(nData);
+          setNearbyMode(true);
+        } else {
+          alert("No shops found within 5km. Showing all shops.");
+          fetchResults("", "All");
         }
-        setShops(nData);
         setProducts([]); // Clear products in nearby mode
-        setNearbyMode(true);
         setLocationLoading(false);
         setPageLoading(false);
       },
@@ -170,14 +173,19 @@ export default function Home() {
           const fetchNearbyShops = async (coords) => {
             try {
               const res = await axios.get(`${API_URL}/api/shops/nearby?lng=${coords[0]}&lat=${coords[1]}`);
-              setShops(Array.isArray(res.data) ? res.data : []);
+              const nData = Array.isArray(res.data) ? res.data : [];
+              if (nData.length > 0) {
+                setShops(nData);
+                setNearbyMode(true);
+              } else {
+                fetchResults("", "All");
+              }
             } catch (err) {
               console.error("Fetch Nearby Error", err);
-              setShops([]);
+              fetchResults("", "All");
             }
           };
-          await fetchNearbyShops(coords); // Call the new function
-          setNearbyMode(true);
+          await fetchNearbyShops(coords); 
           setPageLoading(false);
         },
         () => {

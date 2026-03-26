@@ -124,6 +124,27 @@ export default function Dashboard() {
     }
   };
 
+  const handleCreateShop = async (e) => {
+    e.preventDefault();
+    setIsUpdatingShop(true);
+    try {
+      const payload = {
+        ...shopForm,
+        ...(coords && { location: { type: "Point", coordinates: coords } }),
+      };
+      const res = await axios.post(`${API_URL}/api/shops/add`, payload, {
+        headers: { Authorization: token },
+      });
+      setShop(res.data);
+      alert("Shop Created Successfully! Welcome to your dashboard.");
+      await fetchProducts(res.data._id);
+    } catch (err) {
+      alert(err.response?.data || "Failed to create shop");
+    } finally {
+      setIsUpdatingShop(false);
+    }
+  };
+
   const getLocation = () => {
     navigator.geolocation.getCurrentPosition(
       (pos) => setCoords([pos.coords.longitude, pos.coords.latitude]),
@@ -261,11 +282,75 @@ export default function Dashboard() {
 
   if (!shop) {
     return (
-      <div className="flex flex-col h-screen bg-gray-50 items-center justify-center p-6 text-center">
-        <span className="text-5xl mb-4">⚠️</span>
-        <h2 className="text-2xl font-bold text-gray-800">Shop Data Missing</h2>
-        <p className="text-gray-500 max-w-md mt-2 mb-6">It looks like the signup process skipped creating your shop, or an error occurred. Please contact support.</p>
-        <button onClick={logout} className="px-6 py-2 bg-gray-200 rounded-lg font-bold text-gray-600 hover:bg-gray-300">Logout</button>
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6">
+        <div className="w-full max-w-xl bg-white rounded-[2.5rem] shadow-xl border border-gray-100 p-8 md:p-12 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-green-50 rounded-full translate-x-1/2 -translate-y-1/2"></div>
+          
+          <div className="text-center mb-10 relative z-10">
+            <div className="w-20 h-20 bg-white shadow-lg border border-green-50 rounded-3xl flex items-center justify-center mx-auto mb-6 text-4xl transform hover:rotate-3 transition-transform duration-300">
+              🏪
+            </div>
+            <h2 className="text-3xl font-black text-slate-800 tracking-tight">Setup Your Shop</h2>
+            <p className="text-slate-500 font-medium mt-2">Complete your profile to unlock your merchant dashboard.</p>
+          </div>
+
+          <form onSubmit={handleCreateShop} className="space-y-5 relative z-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="md:col-span-2">
+                <label className="block text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em] mb-2 ml-1">Shop Name</label>
+                <input className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 outline-none focus:bg-white focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 transition"
+                  placeholder="e.g. My Awesome Store" required
+                  value={shopForm.name} onChange={e => setShopForm({ ...shopForm, name: e.target.value })} />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em] mb-2 ml-1">Category</label>
+                <div className="relative">
+                  <select className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 outline-none focus:bg-white focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 transition appearance-none text-slate-500"
+                    required value={shopForm.category} onChange={e => setShopForm({ ...shopForm, category: e.target.value })}>
+                    <option value="">Select Category</option>
+                    {["Food", "Electronics", "Clothing", "Grocery", "Pharmacy", "Other", "Services", "Books"].map(c => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300 font-bold">⌄</span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em] mb-2 ml-1">Business Phone</label>
+                <input className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 outline-none focus:bg-white focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 transition"
+                  placeholder="Business Number" required
+                  value={shopForm.phone} onChange={e => setShopForm({ ...shopForm, phone: e.target.value })} />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em] mb-2 ml-1">Physical Address</label>
+                <input className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 outline-none focus:bg-white focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 transition"
+                  placeholder="Full Street Address" required
+                  value={shopForm.address} onChange={e => setShopForm({ ...shopForm, address: e.target.value })} />
+              </div>
+
+              <div className="md:col-span-2">
+                <button type="button"
+                  className={`w-full p-4 rounded-2xl text-sm font-bold border-2 transition-all flex items-center justify-center gap-2 ${coords ? "bg-emerald-50 border-emerald-500 text-emerald-600 shadow-sm" : "bg-slate-50 border-slate-200 text-slate-400 hover:border-emerald-300 hover:text-emerald-500"}`}
+                  onClick={getLocation}>
+                  {coords ? "✅ Store Location Captured" : "📍 Sync Physical Location"}
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" disabled={isUpdatingShop}
+              className="w-full bg-gradient-to-r from-emerald-500 to-green-600 text-white py-4 rounded-2xl font-black text-lg shadow-xl shadow-emerald-200/50 hover:shadow-emerald-300/50 hover:-translate-y-1 active:translate-y-0 transition-all duration-300 mt-6">
+              {isUpdatingShop ? "Creating Assets..." : "Launch My Dashboard 🚀"}
+            </button>
+
+            <button type="button" onClick={logout}
+              className="w-full text-sm font-bold text-slate-400 hover:text-slate-600 transition-colors mt-6">
+              Logout
+            </button>
+          </form>
+        </div>
       </div>
     );
   }

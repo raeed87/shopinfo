@@ -476,7 +476,7 @@ export default function Dashboard() {
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                      {products.map((p) => (
+                      {(Array.isArray(products) ? products : []).map((p) => (
                         <div key={p._id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col hover:shadow-md transition">
                           <div className="h-40 bg-gray-100 relative">
                             <img src={p.image} alt={p.name} className="w-full h-full object-cover" />

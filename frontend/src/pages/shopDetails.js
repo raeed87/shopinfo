@@ -224,7 +224,7 @@ function ShopDetails() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {products.map(product => (
+            {(Array.isArray(products) ? products : []).map(product => (
               <div key={product._id} className={`group bg-white rounded-3xl border border-gray-100 shadow-sm transition-all duration-300 overflow-hidden flex flex-col ${product.isAvailable === false ? 'opacity-60 grayscale' : 'hover:shadow-xl hover:-translate-y-1'}`}>
                 <div className="relative h-52 overflow-hidden bg-gray-100">
                   <img

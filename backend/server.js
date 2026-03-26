@@ -31,7 +31,8 @@ app.use("/api/users", require("./routes/userRoutes"));
 // --- PRODUCTION CONFIG ---
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../frontend/build")));
-  app.get("/:path*", (req, res) => {
+  // Fallback for React Router: serve index.html for any unknown requests
+  app.use((req, res) => {
     res.sendFile(path.resolve(__dirname, "../frontend", "build", "index.html"));
   });
 } else {

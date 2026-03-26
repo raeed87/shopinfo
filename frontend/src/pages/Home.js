@@ -163,7 +163,7 @@ export default function Home() {
           const coords = [longitude, latitude];
           setUserCoords(coords);
           const res = await axios.get(
-            `http://localhost:5001/api/shops/nearby?lng=${longitude}&lat=${latitude}`
+            `${API_URL}/api/shops/nearby?lng=${longitude}&lat=${latitude}`
           );
           if (res.data.length > 0) {
             setShops(res.data);

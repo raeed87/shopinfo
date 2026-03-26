@@ -2,6 +2,8 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5001";
+
 function AddShop() {
   const [form, setForm] = useState({ name: "", category: "", phone: "", address: "" });
   const [coords, setCoords] = useState(null);
@@ -24,7 +26,7 @@ function AddShop() {
         ...form,
         ...(coords && { location: { type: "Point", coordinates: coords } }),
       };
-      await axios.post("http://localhost:5001/api/shops/add", payload, {
+      await axios.post(`${API_URL}/api/shops/add`, payload, {
         headers: { Authorization: token },
       });
       alert("Shop added!");

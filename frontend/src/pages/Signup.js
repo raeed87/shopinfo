@@ -2,13 +2,15 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5001";
+
 function Signup() {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const navigate = useNavigate();
 
   const handleSignup = async () => {
     try {
-      await axios.post("http://localhost:5001/api/auth/signup", form);
+      await axios.post(`${API_URL}/api/auth/signup`, form);
       alert("Account created! Please login.");
       navigate("/login");
     } catch (err) {

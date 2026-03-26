@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, Link } from "react-router-dom";
 
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5001";
+
 function ManageProducts() {
   const { shopId } = useParams();
   const [products, setProducts] = useState([]);
@@ -12,13 +14,13 @@ function ManageProducts() {
   }, []);
 
   const fetchProducts = async () => {
-    const res = await axios.get(`http://localhost:5001/api/products/${shopId}`);
+    const res = await axios.get(`${API_URL}/api/products/${shopId}`);
     setProducts(res.data);
   };
 
   const deleteProduct = async (id) => {
     if (!window.confirm("Delete this product?")) return;
-    await axios.delete(`http://localhost:5001/api/products/${id}`, {
+    await axios.delete(`${API_URL}/api/products/${id}`, {
       headers: { Authorization: token },
     });
     setProducts(products.filter(p => p._id !== id));

@@ -1,0 +1,6 @@
+--- DB REPORT ---
+Merchants: 3
+Shops: 3
+Merchant (raeedahmadpc@gmail.com): Shop -> das auto
+Merchant (testmerc123@example.com): Shop -> Test Shop
+Merchant (nolocmerch2@example.com): Shop -> No Location Shop

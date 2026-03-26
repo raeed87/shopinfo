@@ -26,6 +26,15 @@ mongoose.connect(process.env.MONGO_URI)
 // Health check for Render
 app.get("/health", (req, res) => res.status(200).send("OK"));
 
+// CRITICAL: Disable aggressive caching for API routes so live DB updates show instantly!
+app.use("/api", (req, res, next) => {
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
+  res.setHeader("Surrogate-Control", "no-store");
+  next();
+});
+
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/shops", require("./routes/shopRoutes"));
 app.use("/api/products", require("./routes/productRoutes"));

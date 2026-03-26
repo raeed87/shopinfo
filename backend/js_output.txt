@@ -1,0 +1,3 @@
+--- JS INVESTIGATION ---
+localhost: >1&&void 0!==arguments[1]&&arguments[1],n="http://localhost";"undefined"!==typeof window&&(n="null"!==window.location.origin?window.location.origin:window.location.href),l(n,"No window.location.(origi
+

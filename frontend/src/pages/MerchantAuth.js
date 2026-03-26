@@ -104,7 +104,7 @@ function MerchantAuth() {
           {/* Form Container */}
           <div className="transition-all duration-500">
             {tab === "login" ? (
-              <div className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <form onSubmit={e => { e.preventDefault(); handleLogin(); }} className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="group">
                   <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1 group-focus-within:text-emerald-500 transition-colors">Email Address</label>
                   <div className="relative">
@@ -131,14 +131,15 @@ function MerchantAuth() {
                 </div>
 
                 <button
+                  type="submit"
                   className="w-full mt-4 bg-gradient-to-r from-emerald-500 to-green-600 text-white py-4 rounded-2xl font-black text-lg shadow-xl shadow-emerald-200/50 hover:shadow-emerald-300/50 hover:-translate-y-1 active:translate-y-0 transition-all duration-300 flex items-center justify-center gap-2"
-                  onClick={handleLogin} disabled={loading}
+                  disabled={loading}
                 >
                   {loading ? <span className="animate-spin rounded-full h-5 w-5 border-2 border-white/30 border-t-white"></span> : "Sign In & Manage"}
                 </button>
-              </div>
+              </form>
             ) : (
-              <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-6 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+              <form onSubmit={e => { e.preventDefault(); handleSignup(); }} className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-6 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
                 
                 {/* SECTION: MERCHANT */}
                 <div className="space-y-4">
@@ -209,11 +210,12 @@ function MerchantAuth() {
                 </div>
 
                 <button
+                  type="submit"
                   className="w-full bg-emerald-600 text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-emerald-100 hover:bg-emerald-700 transition-all active:scale-95"
-                  onClick={handleSignup} disabled={loading}>
+                  disabled={loading}>
                   {loading ? "Creating Assets..." : "Launch My Shop"}
                 </button>
-              </div>
+              </form>
             )}
           </div>
         </div>

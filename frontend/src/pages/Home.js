@@ -89,7 +89,7 @@ export default function Home() {
       if (cat !== "All") shopParams.set("category", cat);
       const shopRes = await axios.get(`${API_URL}/api/shops?${shopParams.toString()}`);
       
-      let sData = shopRes.data;
+      let sData = Array.isArray(shopRes.data) ? shopRes.data : [];
       if (userCoords && sData.length > 0) {
         sData = sData.map(s => {
           const coords = s.location?.coordinates;
@@ -102,7 +102,7 @@ export default function Home() {
       // 2. Fetch Products (Dynamic Smart Search)
       if (searchTerm) {
         const prodRes = await axios.get(`${API_URL}/api/products/search?q=${searchTerm}`);
-        let pData = prodRes.data;
+        let pData = Array.isArray(prodRes.data) ? prodRes.data : [];
         
         // Sort products by proximity if userCoords available
         if (userCoords && pData.length > 0) {
@@ -117,7 +117,10 @@ export default function Home() {
         setProducts([]);
       }
     } catch (err) {
-      console.error("Search failed", err);
+      console.error("Search failed:", err.message);
+      if (err.response) console.log("Error Response Data:", err.response.data);
+      setShops([]);
+      setProducts([]);
     }
     setPageLoading(false);
   }, [userCoords]);
@@ -321,7 +324,7 @@ export default function Home() {
               Product Results for "{search}"
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {products.map(product => (
+              {(Array.isArray(products) ? products : []).map(product => (
                 <Link to={`/shop/${product.shopId?._id}`} key={product._id} className="group">
                   <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-all h-full flex flex-col">
                     <div className="aspect-square rounded-xl overflow-hidden mb-3 bg-gray-50 border border-gray-50 relative">
@@ -385,7 +388,7 @@ export default function Home() {
               </h2>
             )}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {shops.map(shop => {
+              {(Array.isArray(shops) ? shops : []).map(shop => {
                 const dist = userCoords && shop.location?.coordinates?.length === 2
                   ? formatDistance(userCoords, shop.location.coordinates)
                   : null;

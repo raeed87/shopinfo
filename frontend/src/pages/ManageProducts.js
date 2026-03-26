@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, Link } from "react-router-dom";
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5001";
+const API_URL = process.env.REACT_APP_API_URL || (window.location.hostname === "localhost" ? "http://localhost:5001" : "");
 
 function ManageProducts() {
   const { shopId } = useParams();
@@ -14,8 +14,13 @@ function ManageProducts() {
   }, []);
 
   const fetchProducts = async () => {
-    const res = await axios.get(`${API_URL}/api/products/${shopId}`);
-    setProducts(res.data);
+    try {
+      const res = await axios.get(`${API_URL}/api/products/${shopId}`);
+      setProducts(Array.isArray(res.data) ? res.data : []);
+    } catch (err) {
+      console.error("Fetch Products Error:", err);
+      setProducts([]);
+    }
   };
 
   const deleteProduct = async (id) => {

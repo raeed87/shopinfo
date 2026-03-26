@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5001";
+const API_URL = process.env.REACT_APP_API_URL || (window.location.hostname === "localhost" ? "http://localhost:5001" : "");
 
 function AddShop() {
   const [form, setForm] = useState({ name: "", category: "", phone: "", address: "" });

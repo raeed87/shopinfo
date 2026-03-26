@@ -22,7 +22,7 @@ function MapUpdater({ coords }) {
 
 const CLOUD_NAME = "ddpte2a93";
 const UPLOAD_PRESET = "shopinfo_unsigned";
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5001";
+const API_URL = process.env.REACT_APP_API_URL || (window.location.hostname === "localhost" ? "http://localhost:5001" : "");
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("home"); // "home", "products", "settings"
@@ -92,9 +92,10 @@ export default function Dashboard() {
   const fetchProducts = async (shopId) => {
     try {
       const res = await axios.get(`${API_URL}/api/products/${shopId}`);
-      setProducts(res.data);
+      setProducts(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error("Failed to load products", err);
+      setProducts([]);
     }
   };
 

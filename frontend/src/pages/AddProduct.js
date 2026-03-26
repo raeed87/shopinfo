@@ -4,7 +4,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 
 const CLOUD_NAME = "ddpte2a93";
 const UPLOAD_PRESET = "shopinfo_unsigned";
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5001";
+const API_URL = process.env.REACT_APP_API_URL || (window.location.hostname === "localhost" ? "http://localhost:5001" : "");
 
 function AddProduct() {
   const { shopId } = useParams();

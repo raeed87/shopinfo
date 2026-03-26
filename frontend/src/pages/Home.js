@@ -8,7 +8,7 @@ const CATEGORY_ICONS = {
   Grocery: "🛒", Pharmacy: "💊", Other: "📦", Services: "🔧", Books: "📚",
 };
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5001";
+const API_URL = process.env.REACT_APP_API_URL || (window.location.hostname === "localhost" ? "http://localhost:5001" : "");
 
 // Calculate Haversine distance with high precision formatting
 // Calculate Haversine distance with high precision formatting
@@ -122,6 +122,19 @@ export default function Home() {
     setPageLoading(false);
   }, [userCoords]);
 
+  const fetchShops = async () => {
+    setPageLoading(true);
+    try {
+      const res = await axios.get(`${API_URL}/api/shops`);
+      setShops(Array.isArray(res.data) ? res.data : []);
+    } catch (err) {
+      console.error("Fetch Shops Error:", err);
+      setShops([]);
+    } finally {
+      setPageLoading(false);
+    }
+  };
+
   // Fetch nearby shops
   const fetchNearby = () => {
     setLocationLoading(true);
@@ -133,7 +146,7 @@ export default function Home() {
         const res = await axios.get(
           `${API_URL}/api/shops/nearby?lng=${longitude}&lat=${latitude}`
         );
-        let nData = res.data;
+        let nData = Array.isArray(res.data) ? res.data : [];
         if (nData.length > 0) {
           nData = nData.map(s => {
             const sc = s.location?.coordinates;
@@ -162,15 +175,17 @@ export default function Home() {
           const { longitude, latitude } = pos.coords;
           const coords = [longitude, latitude];
           setUserCoords(coords);
-          const res = await axios.get(
-            `${API_URL}/api/shops/nearby?lng=${longitude}&lat=${latitude}`
-          );
-          if (res.data.length > 0) {
-            setShops(res.data);
-            setNearbyMode(true);
-          } else {
-            fetchResults("", "All");
-          }
+          const fetchNearbyShops = async (coords) => {
+            try {
+              const res = await axios.get(`${API_URL}/api/shops/nearby?lng=${coords[0]}&lat=${coords[1]}`);
+              setShops(Array.isArray(res.data) ? res.data : []);
+            } catch (err) {
+              console.error("Fetch Nearby Error", err);
+              setShops([]);
+            }
+          };
+          await fetchNearbyShops(coords); // Call the new function
+          setNearbyMode(true);
           setPageLoading(false);
         },
         () => {

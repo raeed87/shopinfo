@@ -1,0 +1,23 @@
+[
+  {
+    "_id": "69c40c310cf467b5adb23150",
+    "name": "Raeed Ahmad",
+    "email": "raeedahmadpc@gmail.com",
+    "password": "$2b$10$OuUCWSJJggupZvRfajTtYeFFmHjfMQX3vj21X551lgMKPVcsfOAjG",
+    "__v": 0
+  },
+  {
+    "_id": "69c587eeb70311ac96320001",
+    "name": "Test Merchant",
+    "email": "testmerc123@example.com",
+    "password": "$2b$10$lpbzCLq6ZSue2C7J1G37a./01P.g.u0i12XWAAXANTk8dTCC2qPtO",
+    "__v": 0
+  },
+  {
+    "_id": "69c58815b70311ac96320008",
+    "name": "NoLoc Merchant",
+    "email": "nolocmerch2@example.com",
+    "password": "$2b$10$sAi3aBUJ7pBwO1ylK.ueEuQ60.kdrNhTD6f9J0SJkI8r/h4waSsAi",
+    "__v": 0
+  }
+]

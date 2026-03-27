@@ -57,9 +57,13 @@ export default function Dashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const fetchMyShop = async () => {
+  const fetchMyShop = async (forceRefresh = false) => {
     try {
-      const res = await axios.get(`${API_URL}/api/shops/merchant/my`, {
+      setLoading(true);
+      // Ensure we hit the network with a unique query param to absolutely defeat browser Edge caching
+      const cacheBuster = forceRefresh ? `?timestamp=${new Date().getTime()}` : "";
+      
+      const res = await axios.get(`${API_URL}/api/shops/merchant/my${cacheBuster}`, {
         headers: { Authorization: token },
       });
       const data = res.data;
@@ -84,6 +88,10 @@ export default function Dashboard() {
       if (err.response?.status === 401 || err.response?.status === 400) {
         localStorage.clear();
         navigate("/merchant");
+      } else {
+        // Log all other errors (like 500 or Network Errors) explicitly so we can see them.
+        console.error("fetchMyShop Critical Error:", err);
+        if (forceRefresh) alert("Could not reach the server: " + (err.response?.data || err.message));
       }
     }
     setLoading(false);
@@ -103,6 +111,15 @@ export default function Dashboard() {
     localStorage.clear();
     navigate("/merchant");
   };
+
+  // Immediate Sanity Check for Stale LocalStorage
+  // If the user's name is saved as the literal string "undefined", force a logout to wipe the slate.
+  useEffect(() => {
+    if (merchantName === "undefined") {
+      alert("Your session data is stale. Please log in again.");
+      logout();
+    }
+  }, [merchantName]);
 
   // --- SHOP SETTINGS LOGIC ---
   const handleUpdateShop = async (e) => {
@@ -263,10 +280,27 @@ export default function Dashboard() {
   if (!shop) {
     return (
       <div className="flex flex-col h-screen bg-gray-50 items-center justify-center p-6 text-center">
-        <span className="text-5xl mb-4">⚠️</span>
-        <h2 className="text-2xl font-bold text-gray-800">Shop Data Missing</h2>
-        <p className="text-gray-500 max-w-md mt-2 mb-6">It looks like the signup process skipped creating your shop, or an error occurred. Please contact support.</p>
-        <button onClick={logout} className="px-6 py-2 bg-gray-200 rounded-lg font-bold text-gray-600 hover:bg-gray-300">Logout</button>
+        <span className="text-6xl mb-4 drop-shadow-sm">⚠️</span>
+        <h2 className="text-3xl font-black text-slate-800 tracking-tight">Shop Data Missing</h2>
+        <p className="text-slate-500 max-w-md mt-4 text-lg font-medium">
+          It looks like your browser is stuck loading an old cached version of your shop, or the network dropped.
+        </p>
+        
+        <div className="flex flex-col sm:flex-row gap-4 mt-8">
+          <button 
+            onClick={() => fetchMyShop(true)} 
+            className="px-8 py-3 bg-emerald-600 rounded-xl font-bold text-white shadow-lg shadow-emerald-200 hover:bg-emerald-700 hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-center gap-2"
+          >
+            <span>🔄</span> Force Reload Data
+          </button>
+          
+          <button 
+            onClick={logout} 
+            className="px-8 py-3 bg-white border border-slate-200 rounded-xl font-bold text-slate-600 shadow-sm hover:bg-slate-50 hover:text-red-500 transition-colors"
+          >
+            Logout completely
+          </button>
+        </div>
       </div>
     );
   }

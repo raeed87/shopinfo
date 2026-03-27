@@ -13,6 +13,8 @@ function MerchantNavbar() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
   const name = localStorage.getItem("merchantName");
+  // Safe display name - fallback to "Merchant" if name is missing or "undefined"
+  const displayName = (name && name !== "undefined") ? name : "Merchant";
 
   const logout = () => {
     localStorage.clear();
@@ -26,7 +28,7 @@ function MerchantNavbar() {
       {token && (
         <>
           <Link to="/dashboard" className="hover:underline text-sm ml-4">My Shop</Link>
-          <span className="ml-auto text-sm opacity-75">👤 {name}</span>
+          <span className="ml-auto text-sm opacity-75">👤 {displayName}</span>
           <button onClick={logout} className="text-sm text-red-200 hover:underline">Logout</button>
         </>
       )}

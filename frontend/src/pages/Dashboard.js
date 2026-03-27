@@ -53,6 +53,25 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (!token) return navigate("/merchant");
+
+    // Silently fix stale merchantName in localStorage by fetching fresh from backend
+    const fixMerchantName = async () => {
+      const currentName = localStorage.getItem("merchantName");
+      if (!currentName || currentName === "undefined" || currentName === "null") {
+        try {
+          const res = await axios.get(`${API_URL}/api/auth/me`, {
+            headers: { Authorization: token },
+          });
+          if (res.data?.name) {
+            localStorage.setItem("merchantName", res.data.name);
+          }
+        } catch {
+          // Ignore errors - fetchMyShop will handle auth failures
+        }
+      }
+    };
+
+    fixMerchantName();
     fetchMyShop();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -111,15 +130,6 @@ export default function Dashboard() {
     localStorage.clear();
     navigate("/merchant");
   };
-
-  // Immediate Sanity Check for Stale LocalStorage
-  // If the user's name is saved as the literal string "undefined", force a logout to wipe the slate.
-  useEffect(() => {
-    if (merchantName === "undefined") {
-      alert("Your session data is stale. Please log in again.");
-      logout();
-    }
-  }, [merchantName]);
 
   // --- SHOP SETTINGS LOGIC ---
   const handleUpdateShop = async (e) => {

@@ -72,4 +72,18 @@ router.post("/login", async (req, res) => {
   }
 });
 
+// Get current logged-in merchant info (to silently fix stale localStorage names)
+router.get("/me", async (req, res) => {
+  try {
+    const token = req.headers.authorization;
+    if (!token) return res.status(401).json("No token");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const merchant = await Merchant.findById(decoded.id).select("name email");
+    if (!merchant) return res.status(404).json("Merchant not found");
+    res.json({ name: merchant.name, email: merchant.email });
+  } catch (err) {
+    res.status(401).json("Invalid or expired token");
+  }
+});
+
 module.exports = router;

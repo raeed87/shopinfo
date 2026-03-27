@@ -79,12 +79,18 @@ export default function Dashboard() {
   const fetchMyShop = async (forceRefresh = false) => {
     try {
       setLoading(true);
-      // Ensure we hit the network with a unique query param to absolutely defeat browser Edge caching
-      const cacheBuster = forceRefresh ? `?timestamp=${new Date().getTime()}` : "";
+      // ALWAYS cache-bust to ensure fresh data on every load
+      const cacheBuster = `?t=${new Date().getTime()}`;
+      const url = `${API_URL}/api/shops/merchant/my${cacheBuster}`;
+      console.log("[Dashboard] Fetching shop from:", url);
       
-      const res = await axios.get(`${API_URL}/api/shops/merchant/my${cacheBuster}`, {
+      const res = await axios.get(url, {
         headers: { Authorization: token },
       });
+      
+      console.log("[Dashboard] Shop API response status:", res.status);
+      console.log("[Dashboard] Shop data received:", res.data);
+      
       const data = res.data;
       if (data && data._id) {
         setShop(data);
@@ -97,24 +103,28 @@ export default function Dashboard() {
           closingTime: data.closingTime || "22:00",
         });
         if (data.location?.coordinates) {
-          setCoords(data.location.coordinates); // [lng, lat]
+          setCoords(data.location.coordinates);
         }
         await fetchProducts(data._id);
       } else {
+        console.log("[Dashboard] Response was empty or missing _id. Data:", data);
         setShop(null);
       }
     } catch (err) {
+      console.error("[Dashboard] fetchMyShop failed:", err.response?.status, err.response?.data || err.message);
       if (err.response?.status === 401 || err.response?.status === 400) {
+        console.log("[Dashboard] Auth failed - clearing token and redirecting to login");
         localStorage.clear();
         navigate("/merchant");
       } else {
-        // Log all other errors (like 500 or Network Errors) explicitly so we can see them.
-        console.error("fetchMyShop Critical Error:", err);
+        console.error("[Dashboard] Network or server error:", err.message);
         if (forceRefresh) alert("Could not reach the server: " + (err.response?.data || err.message));
+        setShop(null);
       }
     }
     setLoading(false);
   };
+
 
   const fetchProducts = async (shopId) => {
     try {

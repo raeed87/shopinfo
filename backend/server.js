@@ -42,9 +42,21 @@ app.use("/api/users", require("./routes/userRoutes"));
 
 // --- PRODUCTION CONFIG ---
 if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../frontend/build")));
-  // Fallback for React Router: serve index.html for any unknown requests
+  // Serve static files with proper caching
+  app.use(express.static(path.join(__dirname, "../frontend/build"), {
+    setHeaders: (res, filePath) => {
+      if (filePath.endsWith("index.html")) {
+        res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+      } else {
+        // JS/CSS files with hashes can be cached aggressively
+        res.setHeader("Cache-Control", "public, max-age=31536000");
+      }
+    }
+  }));
+
+  // Fallback for React Router: serve index.html with NO CACHE
   app.use((req, res) => {
+    res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
     res.sendFile(path.resolve(__dirname, "../frontend", "build", "index.html"));
   });
 } else {
